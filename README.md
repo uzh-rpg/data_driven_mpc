@@ -74,7 +74,7 @@ We provide instructions of how to use this package in two different simulators. 
 
 First make sure to add to your Python path the main directory of this package. Also activate the virtual environment if created.
 ```
-export PYTHONPATH=$PYTHONPATH:/<CATKIN_WS_DIR>/src/data_driven_mpc/ros_gp_mpc
+export PYTHONPATH=$PYTHONPATH:<CATKIN_WS_DIR>/src/data_driven_mpc/ros_gp_mpc
 ```
 
 ### First steps
