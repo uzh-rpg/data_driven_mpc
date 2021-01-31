@@ -53,12 +53,12 @@ After these steps you should have a catkin workspace containing the packages req
 1. Clone this repository into your catkin workspace.
    ```
    cd <CATKIN_WS_DIR>
-   git clone TODO
+   git clone https://github.com/uzh-rpg/data_driven_mpc.git
    ```
    
 2. Install the rest of required Python libraries:
    ```
-   cd <our_package_name> # TODO: add name of the package when on the open source repo
+   cd data_driven_mpc
    python setup.py install
    ```
  
@@ -74,7 +74,7 @@ We provide instructions of how to use this package in two different simulators. 
 
 First make sure to add to your Python path the main directory of this package. Also activate the virtual environment if created.
 ```
-export PYTHONPATH=$PYTHONPATH:/<CATKIN_WS_DIR>/src/<our_package_name>/ros_gp_mpc  # TODO: package name
+export PYTHONPATH=$PYTHONPATH:/<CATKIN_WS_DIR>/src/data_driven_mpc/ros_gp_mpc
 ```
 
 ### First steps
