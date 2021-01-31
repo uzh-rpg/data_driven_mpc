@@ -201,7 +201,7 @@ def visualize_gp_inference(x_data, u_data, y_data, gp_ensemble, vis_features_x, 
         ax[0].scatter(x_data[:, vis_features_x], y_mse)
         ax[0].set_xlabel(labels[0])
         ax[0].set_ylabel('RMSE')
-        ax[0].set_title('Dataset')
+        ax[0].set_title('Post-processed dataset')
 
         ax[1].scatter(x_data[:, vis_features_x], y_pred, label='GP')
         ax[1].plot(bin_midpoints, win_average, label='window average')

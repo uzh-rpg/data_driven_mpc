@@ -157,6 +157,7 @@ def main(x_features, u_features, reg_y_dim, quad_sim_options, dataset_name,
         git_version = subprocess.check_output(['git', 'describe', '--always']).strip().decode("utf-8")
     except subprocess.CalledProcessError as e:
         print(e.returncode, e.output)
+    print("The model will be saved using hash: %s" % git_version)
 
     gp_name_dict = {"git": git_version, "model_name": model_name, "params": quad_sim_options}
     save_file_path, save_file_name = get_model_dir_and_file(gp_name_dict)
