@@ -1,0 +1,5 @@
+quad_name: 'colibri'
+world_limits: 'flying_room'
+use_ekf_synchronization: True
+control_freq_factor: 6
+environment: 'flying_room'

@@ -1,0 +1,7 @@
+# Optitrack coordinate limits of small flying room
+x_min: -3  # 0
+x_max: 7.5  # 3.5
+y_min: -5  # -1.4
+y_max: 7   # 1.7
+z_min: 0.4
+z_max: 5.0

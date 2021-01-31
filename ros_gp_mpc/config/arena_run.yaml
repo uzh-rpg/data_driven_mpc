@@ -1,0 +1,5 @@
+quad_name: 'colibri'
+world_limits: 'arena'
+use_ekf_synchronization: False
+control_freq_factor: 5
+environment: 'arena'

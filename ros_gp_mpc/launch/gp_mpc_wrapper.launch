@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- true if running the nodes in the gazebo simulator environment. false if running on the real platform-->
+    <arg name="environment" default="flying_room"/>
+
+    <!-- Recording parameters -->
+    <arg name="recording" default="false"/>
+    <arg name="dataset_name" default="gazebo_dataset"/>
+    <arg name="overwrite" default="true"/>
+    <arg name="train_split" default="true"/>
+    <arg name="record_raw_optitrack" default="false"/>
+
+    <!-- Reference trajectory parameters -->
+    <arg name="n_seeds" default="1"/> <!-- How many random seeds to use to generate trajectories -->
+    <arg name="trajectory_speeds" default="[4.0]"/>
+    <arg name="flight_mode" default="random"/> <!-- one of: random, hover, loop -->
+    <arg name="plot" default="false"/>
+
+    <!-- Stable version: Use time horizon of 1 second, 10 control nodes and control @ 50 Hz (control_freq_factor=5) -->
+    <arg name="t_horizon" default="1"/>
+    <arg name="n_nodes" default="10"/>
+
+    <!-- Model loading parameters -->
+    <arg name="model_version" default=""/>
+    <arg name="model_name" default=""/>
+    <arg name="model_type" default="gp"/>
+
+    <!-- Trajectory tracking experiment reset -->
+    <arg name="reset_experiment" default="true"/>
+
+    <group ns="gp_mpc">
+
+        <group if="$(eval arg('environment')=='gazebo')">
+            <!-- Node that runs the MPC -->
+            <node pkg="ros_gp_mpc" type="gp_mpc_node.py" name="mpc_wrapper" output="screen">
+                <rosparam file="$(find ros_gp_mpc)/config/simulation_run.yaml"/>
+
+                <param name="recording" value="$(arg recording)"/>
+                <param name="dataset_name" value="$(arg dataset_name)"/>
+                <param name="overwrite" value="$(arg overwrite)"/>
+                <param name="training_split" value="$(arg train_split)"/>
+                <param name="record_raw_optitrack" value="$(arg record_raw_optitrack)"/>
+
+                <param name="model_type" value="$(arg model_type)"/>
+                <param name="model_version" value="$(arg model_version)"/>
+                <param name="model_name" value="$(arg model_name)"/>
+
+                <param name="plot" value="$(arg plot)"/>
+                <param name="t_horizon" value="$(arg t_horizon)"/>
+                <param name="n_nodes" value="$(arg n_nodes)"/>
+
+                <param name="reset_experiment" value="$(arg reset_experiment)"/>
+            </node>
+
+            <!-- Random trajectory generator -->
+            <node pkg="ros_gp_mpc" type="reference_publisher_node.py" name="ref_gen" output="screen">
+                <rosparam file="$(find ros_gp_mpc)/config/simulation_run.yaml"/>
+                <rosparam file="$(find ros_gp_mpc)/config/circle_and_lemniscate_options.yaml"/>
+
+                <param name="n_seeds" value="$(arg n_seeds)"/>
+                <param name="v_list" value="$(arg trajectory_speeds)"/>
+                <param name="mode" value="$(arg flight_mode)"/>
+
+                <param name="t_horizon" value="$(arg t_horizon)"/>
+                <param name="n_nodes" value="$(arg n_nodes)"/>
+
+                <param name="plot" value="$(arg plot)"/>
+            </node>
+        </group>
+
+        <group if="$(eval arg('environment')=='flying_room')">
+            <!-- Node that runs the MPC -->
+            <node pkg="ros_gp_mpc" type="gp_mpc_node.py" name="mpc_wrapper" output="screen">
+                <rosparam file="$(find ros_gp_mpc)/config/flying_room_run.yaml"/>
+
+                <param name="recording" value="$(arg recording)"/>
+                <param name="dataset_name" value="$(arg dataset_name)"/>
+                <param name="overwrite" value="$(arg overwrite)"/>
+                <param name="training_split" value="$(arg train_split)"/>
+                <param name="record_raw_optitrack" value="$(arg record_raw_optitrack)"/>
+
+                <param name="model_type" value="$(arg model_type)"/>
+                <param name="model_version" value="$(arg model_version)"/>
+                <param name="model_name" value="$(arg model_name)"/>
+
+                <param name="plot" value="$(arg plot)"/>
+                <param name="t_horizon" value="$(arg t_horizon)"/>
+                <param name="n_nodes" value="$(arg n_nodes)"/>
+
+                <param name="reset_experiment" value="$(arg reset_experiment)"/>
+            </node>
+
+            <!-- Random trajectory generator -->
+            <node pkg="ros_gp_mpc" type="reference_publisher_node.py" name="ref_gen" output="screen">
+                <rosparam file="$(find ros_gp_mpc)/config/flying_room_run.yaml"/>
+                <rosparam file="$(find ros_gp_mpc)/config/circle_and_lemniscate_options.yaml"/>
+
+                <param name="n_seeds" value="$(arg n_seeds)"/>
+                <param name="v_list" value="$(arg trajectory_speeds)"/>
+                <param name="mode" value="$(arg flight_mode)"/>
+
+                <param name="t_horizon" value="$(arg t_horizon)"/>
+                <param name="n_nodes" value="$(arg n_nodes)"/>
+
+                <param name="plot" value="$(arg plot)"/>
+            </node>
+        </group>
+
+        <group if="$(eval arg('environment')=='arena')">
+            <!-- Node that runs the MPC -->
+            <node pkg="ros_gp_mpc" type="gp_mpc_node.py" name="mpc_wrapper" output="screen">
+                <rosparam file="$(find ros_gp_mpc)/config/arena_run.yaml"/>
+
+                <param name="recording" value="$(arg recording)"/>
+                <param name="dataset_name" value="$(arg dataset_name)"/>
+                <param name="overwrite" value="$(arg overwrite)"/>
+                <param name="training_split" value="$(arg train_split)"/>
+                <param name="record_raw_optitrack" value="$(arg record_raw_optitrack)"/>
+
+                <param name="model_type" value="$(arg model_type)"/>
+                <param name="model_version" value="$(arg model_version)"/>
+                <param name="model_name" value="$(arg model_name)"/>
+
+                <param name="plot" value="$(arg plot)"/>
+                <param name="t_horizon" value="$(arg t_horizon)"/>
+                <param name="n_nodes" value="$(arg n_nodes)"/>
+
+                <param name="reset_experiment" value="$(arg reset_experiment)"/>
+            </node>
+
+            <!-- Random trajectory generator -->
+            <node pkg="ros_gp_mpc" type="reference_publisher_node.py" name="ref_gen" output="screen">
+                <rosparam file="$(find ros_gp_mpc)/config/arena_run.yaml"/>
+                <rosparam file="$(find ros_gp_mpc)/config/circle_and_lemniscate_options.yaml"/>
+
+                <param name="n_seeds" value="$(arg n_seeds)"/>
+                <param name="v_list" value="$(arg trajectory_speeds)"/>
+                <param name="mode" value="$(arg flight_mode)"/>
+
+                <param name="t_horizon" value="$(arg t_horizon)"/>
+                <param name="n_nodes" value="$(arg n_nodes)"/>
+
+                <param name="plot" value="$(arg plot)"/>
+            </node>
+        </group>
+
+    </group>
+</launch>
