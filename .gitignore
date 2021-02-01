@@ -3,7 +3,7 @@ data/
 results/
 .idea/
 *.pyc
-acados_models/*
+ros_gp_mpc/acados_models/*
 c_generated_code/
 *.egg-info/
 dist/
