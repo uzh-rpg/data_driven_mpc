@@ -201,11 +201,11 @@ In this section, we demonstrate how to use our repository on the `Gazebo Simulat
 ### Preparing the simulation environment
 
 First, follow the installation guide for the [rpg_quadrotor_package](https://github.com/uzh-rpg/rpg_quadrotor_control/wiki/Installation-Guide) if you didn't do it previously.
-*TODO*: Currently I have the gazebo simulator at 50% speed)
 
-Then, run an empty world simulation, and enable the command override function. If the Gazebo GUI does not show up, you may need to set the gui parameter value to true in the launchfile:
+Then, run an empty world simulation, and enable the command override function. 
+Due to the increased computational demand of running the Gazebo simulator in parallel to the controller, the following launchfile runs the gazebo simulator at 50% speed:
 ```
-roslaunch rpg_rotors_interface quadrotor_empty_world.launch enable_command_feedthrough:=True
+roslaunch ros_gp_mpc quadrotor_empty_world.launch enable_command_feedthrough:=True
 ```
 
 Finally, click `Connect` and `Arm Bridge` on the RPG Quadrotor GUI.
@@ -216,6 +216,11 @@ Run the following script to execute several random trajectories on the `Gazebo S
 
 ```
 roslaunch ros_gp_mpc gp_mpc_wrapper.launch recording:=True dataset_name:=gazebo_dataset environment:=gazebo flight_mode:=random n_seeds:=10
+```
+
+Leave the script running until it outputs the following message: 
+```
+[INFO] [1612101145.957326, 230.510000]: No more references will be received
 ```
 
 Update the `ModelFitConfig` class from `config/configuration_parameters.py` file to point the training scripts to the new dataset:
@@ -238,7 +243,8 @@ We don't provide an automatic script to compare models in the Gazebo environment
 
 #### Run a Circle trajectory without correction:
 
-Run the following launch file. Set `plot:=True` for displaying a plot of the trajectory that will be executed beforehand, and the tracking performance after finishing the run:
+Run the following launch file. Set `plot:=True` for displaying a plot of the trajectory that will be executed beforehand, and the tracking performance after finishing the run.
+Close the plot and the tracking will start automatically:
 ```
 roslaunch ros_gp_mpc gp_mpc_wrapper.launch environment:=gazebo flight_mode:=loop plot:=True
 ```

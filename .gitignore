@@ -1,6 +1,10 @@
 venv/*
 data/
+results/
 .idea/
 *.pyc
 acados_models/*
 c_generated_code/
+*.egg-info/
+dist/
+build/

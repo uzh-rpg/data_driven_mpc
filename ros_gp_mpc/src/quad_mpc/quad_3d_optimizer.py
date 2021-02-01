@@ -135,7 +135,7 @@ class Quad3DOptimizer:
 
         # Ensure current working directory is current folder
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        self.acados_models_dir = '../../../../../acados_models'
+        self.acados_models_dir = '../../acados_models'
         safe_mkdir_recursive(os.path.join(os.getcwd(), self.acados_models_dir))
 
         for key, key_model in zip(acados_models.keys(), acados_models.values()):
