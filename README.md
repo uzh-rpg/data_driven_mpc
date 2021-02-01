@@ -39,8 +39,8 @@ source gp_mpc_venv/bin/activate
 ### Additional Requirements
 
 The code that runs on the `Gazebo Simulation` environment builds on `rpg_quadrotor_control`. You may skip this step if intending to use only the `Simplified Simulation`. <br/>
-To create a catkin workspace and run our simultion, follow these [installation instructions](https://github.com/uzh-rpg/rpg_quadrotor_control/wiki/Installation-Guide). <br/>
-After these steps you should have a catkin workspace containing the packages required to run the RPG Quadrotor simulation.
+Otherwise, create a catkin workspace following these [installation instructions](https://github.com/uzh-rpg/rpg_quadrotor_control/wiki/Installation-Guide). <br/>
+After these steps you should have all the ROS packages required to run the RPG Quadrotor simulation also in the `Gazebo Simulation`.
 
 
 ### Initial setup
