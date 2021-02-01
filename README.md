@@ -167,7 +167,7 @@ python src/model_fitting/gp_fitting.py --n_points 20 --model_name simple_sim_gp 
 ```
 The models will be saved under the directory `ros_gp_mpc/results/model_fitting/<git_hash>/`. 
 
-You can visualize the performance of the combined three models using the visualization script. Make sure to input the correct git hash.
+You can visualize the performance of the combined three models using the visualization script. Make sure to input the correct model version (git hash) and model name.
 ```
 python src/model_fitting/gp_visualization.py --model_name simple_sim_gp --model_version <git_hash>
 ```
@@ -184,9 +184,11 @@ python src/model_fitting/rdrv_fitting.py --model_name simple_sim_rdrv --x 7 8 9
 To compare the trained models, we provide an automatic script for the `Simplified Simulation`. Running the following command will compare the specified models with the "Ideal" and the "Nominal" scenarios by default, and produce several results plots in the directory: `results/images/`. Using the `--fast` argument will run the script faster with less velocity samples.
 
 ```
-# For example:
-# python src/experiments/comparative_experiment.py --model_version 42b8650b 42b8650b --model_name gp_test rdrv_test --model_type gp rdrv --fast
 python src/experiments/comparative_experiment.py --model_version <git_hash_1 git_hash_2 ...> --model_name <name_1 name_2 ...> --model_type <type_1 type_2> --fast
+```
+For example:
+```
+python src/experiments/comparative_experiment.py --model_version 42b8650b 42b8650b --model_name simple_sim_gp simple_sim_rdrv --model_type gp rdrv --fast
 ```
 
 <p align="center">
