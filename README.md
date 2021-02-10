@@ -15,7 +15,12 @@ Paper: [Data-Driven MPC for Quadrotors](http://rpg.ifi.uzh.ch/docs/RAL21_Torrent
 Video: [YouTube](https://youtu.be/FHvDghUUQtc)
 
 ```
-TODO: add bibtex
+@article{torrente2021data,
+  title={Data-Driven MPC for Quadrotors},
+  author={Torrente, Guillem and Kaufmann, Elia and Foehn, Philipp and Scaramuzza, Davide},
+  booktitle={arXiv},
+  year={2021}
+}
 ```
 
 ## Installation
