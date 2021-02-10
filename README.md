@@ -10,9 +10,9 @@ This repo contains the code associated to our paper Data-Driven MPC for Quadroto
 
 If you use this code in an academic context, please cite the following publication:
 
-Paper: [Data-Driven MPC for Quadrotors](TODO: link)
+Paper: [Data-Driven MPC for Quadrotors](http://rpg.ifi.uzh.ch/docs/RAL21_Torrente.pdf)
 
-Video: [YouTube](TODO: link)
+Video: [YouTube](https://youtu.be/FHvDghUUQtc)
 
 ```
 TODO: add bibtex
