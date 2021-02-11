@@ -2,9 +2,7 @@
 
 This repo contains the code associated to our paper Data-Driven MPC for Quadrotors. 
 
-<p align="center">
-  <img src="./img/smoke.png" alt="drone-smoke" width="520" height="290">
-</p>
+[![Data-Driven MPC for Quadrotors](http://rpg.ifi.uzh.ch/img/papers/RAL21_Torrente_play_button.png)](https://youtu.be/FHvDghUUQtc)
 
 ### Citing
 
