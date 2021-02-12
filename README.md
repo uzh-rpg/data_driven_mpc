@@ -21,6 +21,30 @@ Video: [YouTube](https://youtu.be/FHvDghUUQtc)
 }
 ```
 
+## License
+
+Copyright (C) 2020-2021 Guillem Torrente, Elia Kaufmann, Philipp Foehn, Davide Scaramuzza, Robotics and Perception Group, University of Zurich
+
+This is research code, expect that it changes often and any fitness for a particular purpose is disclaimed.
+For a commercial license, please contact [Davide Scaramuzza](http://rpg.ifi.uzh.ch/people_scaramuzza.html).
+
+```
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
+
+This work depends on the ACADOS Toolkit, developed by the Optimization in Engineering Center (OPTEC) under supervision of Moritz Diehl. Licensing detail can be found on the [ACADOS github](https://github.com/acados/acados/blob/master/LICENSE). It is released under the BSD license.
+
 ## Installation
 
 ### Minimal Requirements
