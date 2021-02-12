@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+
 """Setup module for project."""
 
 setup(
@@ -24,7 +25,7 @@ setup(
         'PyYAML==5.3.1',
         'pycryptodomex==3.9.8',
         'gnupg==2.3.1',
-	'rospkg==1.2.8',
-	'tikzplotlib==0.9.4'
+        'rospkg==1.2.8',
+        'tikzplotlib==0.9.4'
     ],
 )
