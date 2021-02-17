@@ -71,8 +71,7 @@ class ROSGPMPC:
         q_mask = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]).T
 
         quad_mpc = Quad3DMPC(quad, t_horizon=t_horizon, optimization_dt=opt_dt, n_nodes=n_mpc_nodes,
-                             m_integrations_per_node=1, pre_trained_models=gp_models,
-                             model_name=quad_name, solver_options=acados_config,
+                             pre_trained_models=gp_models, model_name=quad_name, solver_options=acados_config,
                              q_mask=q_mask, q_cost=q_diagonal, r_cost=r_diagonal, rdrv_d_mat=rdrv)
 
         self.quad_name = quad_name

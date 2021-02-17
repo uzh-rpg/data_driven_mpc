@@ -19,9 +19,8 @@ import numpy as np
 import matplotlib.animation as animation
 from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 from matplotlib.colorbar import ColorbarBase
-from matplotlib.patches import Ellipse
-import matplotlib.transforms as transforms
 from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 
 from config.configuration_parameters import DirectoryConfig as PathConfig
 from src.utils.utils import v_dot_q, quaternion_to_euler, quaternion_inverse, q_dot_q, safe_mknode_recursive, \
@@ -108,26 +107,6 @@ def draw_covariance_ellipsoid(center, covar):
     y = np.reshape(y, -1)
     z = np.reshape(z, -1)
     return x, y, z
-
-
-def draw_horizontal_ellipse(center, radii):
-    """
-    Returns the coordinates for drawing an horizontal 2D ellipse given its center and radii
-    :param center: x, y coordinates of ellipse center
-    :param radii: x, y radii
-    :return: a tuple of x, y coordinates to plot the ellipse
-    """
-
-    a, b = radii
-    h, k = center
-
-    x = np.linspace(h - a, h + a, 20)
-
-    y = np.concatenate(
-        (np.sqrt((1 - (x - h) ** 2 / a ** 2) * (b ** 2)) + k,
-         np.flip(-np.sqrt((1 - (x - h) ** 2 / a ** 2) * (b ** 2)) + k)))
-
-    return np.concatenate((x, np.flip(x))), y
 
 
 def visualize_data_distribution(x_data, y_data, clusters, x_pruned, y_pruned):
@@ -319,53 +298,6 @@ def visualize_gp_inference(x_data, u_data, y_data, gp_ensemble, vis_features_x, 
     _ = animation.FuncAnimation(fig, animate, init_func=init, frames=360, interval=20, blit=False)
 
     plt.show()
-
-
-def confidence_ellipse(ax, mean_x, mean_y, cov_mat, n_std=3.0, facecolor='none', **kwargs):
-    """
-    Create a plot of the covariance confidence ellipse of *x* and *y*.
-
-    Parameters
-    ----------
-    mean_x, mean_y : float
-        Center position of the confidence ellipse (equivalent to expected value).
-
-    n_std : float
-        The number of standard deviations to determine the ellipse's radii.
-
-    cov_mat : 2 x 2 float matrix
-        A 2x2 covariance matrix for the variables x and y
-
-    **kwargs
-        Forwarded to `~matplotlib.patches.Ellipse`
-
-    Returns
-    -------
-    matplotlib.patches.Ellipse
-    """
-
-    pearson = cov_mat[0, 1]/np.sqrt(cov_mat[0, 0] * cov_mat[1, 1])
-    if np.any(cov_mat < 0):
-        print("Got a negative covariance element in covariance matrix: ", cov_mat)
-    if np.isnan(pearson):
-        return
-
-    # Using a special case to obtain the eigenvalues of this two-dimensional dataset.
-    ell_radius_x = np.sqrt(1 + pearson)
-    ell_radius_y = np.sqrt(1 - pearson)
-    ellipse = Ellipse((0, 0), width=ell_radius_x * 2, height=ell_radius_y * 2, facecolor=facecolor, **kwargs)
-
-    # Calculating the standard deviation of x from the square root of the variance and multiplying
-    # with the given number of standard deviations.
-    scale_x = np.sqrt(cov_mat[0, 0]) * n_std
-
-    # calculating the standard deviation of y ...
-    scale_y = np.sqrt(cov_mat[1, 1]) * n_std
-
-    transf = transforms.Affine2D().rotate_deg(45).scale(scale_x, scale_y).translate(mean_x, mean_y)
-    ellipse.set_transform(transf + ax.transData)
-
-    return ellipse
 
 
 def initialize_drone_plotter(world_rad, quad_rad, n_props, full_traj=None):

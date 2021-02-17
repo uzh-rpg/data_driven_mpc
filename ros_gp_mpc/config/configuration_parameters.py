@@ -57,10 +57,17 @@ class ModelFitConfig:
     """
 
     # ## Dataset loading ## #
-    ds_name = "gazebo_dataset"
+    ds_name = "simplified_sim_dataset"
     ds_metadata = {
-        "gazebo": "default",
+        "noisy": True,
+        "drag": True,
+        "payload": False,
+        "motor_noise": True
     }
+
+    # ds_metadata = {
+    #     "gazebo": "default",
+    # }
 
     # ## Visualization ## #
     # Training mode

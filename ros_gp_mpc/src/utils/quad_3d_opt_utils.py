@@ -50,15 +50,10 @@ def discretize_dynamics_and_cost(t_horizon, n_points, m_steps_per_point, x, u, d
         k4 = dynamics_f(x=x + dt * k3, u=u)['x_dot']
         x_out = x + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
 
-        if cost_f and cost_f[j] is not None:
-            k1_q = cost_f[j](x=x, u=u)['q']
-            k2_q = cost_f[j](x=x + dt / 2 * k1, u=u)['q']
-            k3_q = cost_f[j](x=x + dt / 2 * k2, u=u)['q']
-            k4_q = cost_f[j](x=x + dt * k3, u=u)['q']
-
-            q = q + dt / 6 * (k1_q + 2 * k2_q + 2 * k3_q + k4_q)
-
         x = x_out
+
+        if cost_f and cost_f[j] is not None:
+            q = q + cost_f[j](x=x, u=u)['q']
 
     return cs.Function('F', [x0, u], [x, q], ['x0', 'p'], ['xf', 'qf'])
 
