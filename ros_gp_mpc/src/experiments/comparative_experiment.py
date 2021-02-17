@@ -90,7 +90,7 @@ def prepare_quadrotor_mpc(simulation_options, version=None, name=None, reg_type=
 
     # Initialize quad MPC
     quad_mpc = Quad3DMPC(my_quad, t_horizon=t_horizon, optimization_dt=node_dt, simulation_dt=simulation_dt,
-                         q_cost=q_diagonal, r_cost=r_diagonal, n_nodes=n_mpc_nodes, m_integrations_per_node=1,
+                         q_cost=q_diagonal, r_cost=r_diagonal, n_nodes=n_mpc_nodes,
                          pre_trained_models=pre_trained_models, model_name=quad_name, q_mask=q_mask, rdrv_d_mat=rdrv_d)
 
     return quad_mpc

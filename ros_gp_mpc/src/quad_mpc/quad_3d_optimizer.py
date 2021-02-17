@@ -26,7 +26,7 @@ from src.utils.quad_3d_opt_utils import discretize_dynamics_and_cost
 
 
 class Quad3DOptimizer:
-    def __init__(self, quad, t_horizon=1, n_nodes=20, integrations_per_node=1,
+    def __init__(self, quad, t_horizon=1, n_nodes=20,
                  q_cost=None, r_cost=None, q_mask=None,
                  B_x=None, gp_regressors=None, rdrv_d_mat=None,
                  model_name="quad_3d_acados_mpc", solver_options=None):
@@ -35,8 +35,7 @@ class Quad3DOptimizer:
         :type quad: Quadrotor3D
         :param t_horizon: time horizon for MPC optimization
         :param n_nodes: number of optimization nodes until time horizon
-        :param integrations_per_node: number of discretization steps between two nodes in MPC model integration.
-        :param q_cost: diagonal of Q matrix for LQR cost of MPC cost function. Must be a numpy array of length 13.
+        :param q_cost: diagonal of Q matrix for LQR cost of MPC cost function. Must be a numpy array of length 12.
         :param r_cost: diagonal of R matrix for LQR cost of MPC cost function. Must be a numpy array of length 4.
         :param B_x: dictionary of matrices that maps the outputs of the gp regressors to the state space.
         :param gp_regressors: Gaussian Process ensemble for correcting the nominal model
@@ -56,7 +55,6 @@ class Quad3DOptimizer:
 
         self.T = t_horizon  # Time horizon
         self.N = n_nodes  # number of control nodes within horizon
-        self.M = integrations_per_node  # RK4 integration steps per pair of control nodes
 
         self.quad = quad
 
@@ -86,13 +84,9 @@ class Quad3DOptimizer:
         # Linearized model dynamics symbolic function
         self.quad_xdot_jac = self.linearized_quad_dynamics()
 
-        self.M_w = cs.MX(np.concatenate((q_cost, r_cost)))
-        self.q_mask = q_mask
-
         # Initialize objective function, 0 target state and integration equations
         self.L = None
         self.target = None
-        self.x_target = None
 
         # Check if GP ensemble has an homogeneous feature space (if actual Ensemble)
         if gp_regressors is not None and gp_regressors.homogeneous:
@@ -126,14 +120,14 @@ class Quad3DOptimizer:
         # Build full model. Will have 13 variables. self.dyn_x contains the symbolic variable that
         # should be used to evaluate the dynamics function. It corresponds to self.x if there are no GP's, or
         # self.x_with_gp otherwise
-        acados_models, nominal_with_gp, self.dyn_x = self.acados_setup_model(
+        acados_models, nominal_with_gp = self.acados_setup_model(
             self.quad_xdot_nominal(x=self.x, u=self.u)['x_dot'], model_name)
 
         # Convert dynamics variables to functions of the state and input vectors
         self.quad_xdot = {}
         for dyn_model_idx in nominal_with_gp.keys():
             dyn = nominal_with_gp[dyn_model_idx]
-            self.quad_xdot[dyn_model_idx] = cs.Function('x_dot', [self.dyn_x, self.u], [dyn], ['x', 'u'], ['x_dot'])
+            self.quad_xdot[dyn_model_idx] = cs.Function('x_dot', [self.x, self.u], [dyn], ['x', 'u'], ['x_dot'])
 
         # ### Setup and compile Acados OCP solvers ### #
         self.acados_ocp_solver = {}
@@ -269,8 +263,6 @@ class Quad3DOptimizer:
         :return: Returns a total of three outputs, where m is the number of GP's in the GP ensemble, or 1 if no GP:
             - A dictionary of m AcadosModel of the GP-augmented quadrotor
             - A dictionary of m CasADi symbolic nominal dynamics equations with GP mean value augmentations (if with GP)
-            - The state variable to use for evaluating the functions. Will be the augmented state (26 dim) with the
-              smoothed state for inference if with GP, or just the 13-dimension full state.
         :rtype: dict, dict, cs.MX
         """
 
@@ -344,8 +336,7 @@ class Quad3DOptimizer:
 
             acados_models[0] = fill_in_acados_model(x=x_, u=self.u, p=[], dynamics=dynamics_, name=model_name)
 
-        x_dyn = self.x
-        return acados_models, dynamics_equations, x_dyn
+        return acados_models, dynamics_equations
 
     def quad_dynamics(self, rdrv_d):
         """
@@ -528,7 +519,7 @@ class Quad3DOptimizer:
         dynamics = self.quad_xdot[use_model] if use_gp else self.quad_xdot_nominal
 
         # Call with self.x_with_gp even if use_gp=False
-        return discretize_dynamics_and_cost(t_horizon, n, m, self.dyn_x, self.u, dynamics, self.L, i)
+        return discretize_dynamics_and_cost(t_horizon, n, m, self.x, self.u, dynamics, self.L, i)
 
     def run_optimization(self, initial_state=None, use_model=0, return_x=False, gp_regression_state=None):
         """
