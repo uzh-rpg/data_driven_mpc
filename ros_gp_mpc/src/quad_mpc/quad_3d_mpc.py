@@ -20,7 +20,7 @@ from src.utils.utils import make_bx_matrix
 
 
 class Quad3DMPC:
-    def __init__(self, my_quad, t_horizon=1.0, n_nodes=5, m_integrations_per_node=1, q_cost=None, r_cost=None,
+    def __init__(self, my_quad, t_horizon=1.0, n_nodes=5, q_cost=None, r_cost=None,
                  optimization_dt=5e-2, simulation_dt=5e-4, pre_trained_models=None, model_name="my_quad", q_mask=None,
                  solver_options=None, rdrv_d_mat=None):
         """
@@ -31,8 +31,6 @@ class Quad3DMPC:
         :param optimization_dt: time step between two successive optimizations intended to be used.
         :param simulation_dt: discretized time-step for the quadrotor simulation
         :param pre_trained_models: additional pre-trained GP regressors to be combined with nominal model in the MPC
-        :param m_integrations_per_node: how many times the dynamics are integrated between two MPC nodes. Must be int.
-        :type m_integrations_per_node: int
         :param q_cost: diagonal of Q matrix for LQR cost of MPC cost function. Must be a numpy array of length 13.
         :param r_cost: diagonal of R matrix for LQR cost of MPC cost function. Must be a numpy array of length 4.
         :param q_mask: Optional boolean mask that determines which variables from the state compute towards the
@@ -76,7 +74,6 @@ class Quad3DMPC:
         self.quad_opt = Quad3DOptimizer(my_quad, t_horizon=t_horizon, n_nodes=n_nodes,
                                         q_cost=q_cost, r_cost=r_cost,
                                         B_x=self.B_x, gp_regressors=self.gp_ensemble,
-                                        integrations_per_node=m_integrations_per_node,
                                         model_name=model_name, q_mask=q_mask,
                                         solver_options=solver_options, rdrv_d_mat=rdrv_d_mat)
 

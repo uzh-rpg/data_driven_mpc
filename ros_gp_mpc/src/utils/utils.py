@@ -235,38 +235,6 @@ def load_pickled_models(directory='', file_name='', model_options=None):
     return pre_trained_models
 
 
-def scale_vec(vec, scaler):
-    if isinstance(vec, cs.MX):
-        if isinstance(scaler, preprocessing.StandardScaler):
-            raise NotImplementedError
-        else:
-            return (vec - cs.MX(scaler["mean"])) / cs.MX(scaler["std"])
-
-    if isinstance(scaler, preprocessing.StandardScaler):
-        return scaler.transform(vec)
-    else:
-        return (vec - scaler["mean"]) / scaler["std"]
-
-
-def un_scale_vec(vec, scaler, use_mean=True):
-    """
-    Computes the de-standardization of a vector, given a scaler object. In case use_mean is set to false, only the
-    standard deviation will be de-standardized.
-    :param vec: vector to be de-standardized
-    :param scaler: scaler object. Can be either a Scikit StandardScaler or a dictionary with the mean and standard
-    deviation values of the training set.
-    :param use_mean: boolean - whether to re-normalize using the mean value of the training set (default) or not.
-    :return: the de-standardized vector.
-    """
-
-    if vec is None:
-        return None
-    if isinstance(scaler, preprocessing.StandardScaler):
-        return scaler.inverse_transform(vec) if use_mean else scaler.scale_ * vec
-    else:
-        return vec * scaler["std"] + scaler["mean"] if use_mean else scaler["std"] * vec
-
-
 def interpol_mse(t_1, x_1, t_2, x_2, n_interp_samples=1000):
     if np.all(t_1 == t_2):
         return np.mean(np.sqrt(np.sum((x_1 - x_2) ** 2, axis=1)))
@@ -775,49 +743,6 @@ def sample_random_points(points, used_idx, points_to_sample, dense_gp=None):
     return used_idx
 
 
-def find_worse_predictions(gp, x, y, n_points, not_in_set=None):  # TODO: deprecate
-    """
-    Evaluates a GP ensemble with a data set and selects n_points (ideally spaced between them but no strong guarantees)
-    where the evaluations where the worst.
-    :param gp: Gaussian Process ensemble
-    :param x: prediction features. Array of shape n x d
-    :param y: prediction ground truth. Array of shape n x d'
-    :param n_points: number of points selected as worst
-    :param not_in_set: A list of d' arrays of indices (between 0 and n-1) that should not be picked.
-    :return: A list of length d' with the indices of the n_points selected for each GP.
-    """
-
-    # Make predictions of all points
-    predicts, std, _ = gp.predict(x.T, return_std=True)
-
-    # Calculate error of predictions
-    error = np.abs((y - predicts.T)) * std.T
-
-    y_dim = error.shape[1]
-
-    # Remove "forbidden" set
-    if not_in_set is not None:
-        for dim in range(y_dim):
-            error[not_in_set[dim], dim] = 0
-
-    selected_points = [[]] * y_dim
-
-    for dim in range(y_dim):
-
-        dim_points = []
-        for i in range(n_points):
-            closest_point = int(np.argmax(error[:, dim]))
-
-            # Mask current point and close ones
-            error[closest_point - 10: closest_point + 10, dim] = 0
-
-            dim_points.append(closest_point)
-
-        selected_points[dim] = dim_points
-
-    return selected_points
-
-
 def parse_xacro_file(xacro):
     """
     Reads a .xacro file describing a robot for Gazebo and returns a dictionary with its properties.
@@ -900,48 +825,6 @@ def quaternion_state_mse(x, x_ref, mask):
     return np.sqrt((e * np.array(mask)).dot(e))
 
 
-def black_magic_smooth(x, window_len=11, window='hanning'):
-    """smooth the data using a window with requested size.
-    This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal
-    (with the window size) in both ends so that transient parts are minimized
-    in the beginning and end part of the output signal.
-    input:
-        x: the input signal
-        window_len: the dimension of the smoothing window; should be an odd integer
-        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
-            flat window will produce a moving average smoothing.
-    output:
-        the smoothed signal
-    example:
-    t=linspace(-2,2,0.1)
-    x=sin(t)+randn(len(t))*0.1
-    y=smooth(x)
-    see also:
-    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
-    scipy.signal.lfilter
-    TODO: the window parameter could be the window itself if an array instead of a string
-    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
-    """
-
-    if x.ndim != 1:
-        raise ValueError("smooth only accepts 1 dimension arrays.")
-    if x.size < window_len:
-        raise ValueError("Input vector needs to be bigger than window size.")
-    if window_len < 3:
-        return x
-    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
-        raise ValueError("Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
-    s = np.r_[x[window_len - 1:0:-1], x, x[-1:-window_len:-1]]
-    # print(len(s))
-    if window == 'flat':  # moving average
-        w = np.ones(window_len, 'd')
-    else:
-        w = eval('np.' + window + '(window_len)')
-    y = np.convolve(w / w.sum(), s, mode='valid')
-    return y
-
-
 def separate_variables(traj):
     """
     Reshapes a trajectory into expected format.
@@ -956,22 +839,3 @@ def separate_variables(traj):
     v_traj = traj[:, 7:10]
     r_traj = traj[:, 10:]
     return [p_traj, a_traj, v_traj, r_traj]
-
-
-def calculate_error(y_true, y_features, true_y_features, mean_pred):
-
-    err = np.zeros(y_true.shape[0])
-    for i, y in enumerate(y_features):
-        err += (y_true[:, y] - mean_pred[:, i]) ** 2
-
-    for y in true_y_features:
-        if y not in y_features:
-            err += y_true[:, y] ** 2
-
-    rmse = np.mean(np.sqrt(err))
-    nominal_rmse = np.mean(np.sqrt(np.sum(y_true[:, true_y_features] ** 2, 1)))
-    improvement = (100 - rmse / nominal_rmse * 100)
-    print('Nominal RMSE: %.5f' % nominal_rmse)
-    print('GP augmented RMSE: %.5f' % rmse)
-    print('Improvement: %.5f%%' % improvement)
-    return nominal_rmse, rmse, improvement
