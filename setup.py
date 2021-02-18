@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 """Setup module for project."""
 
 setup(
-    name='Learning-guided MPC for quadrotors',
+    name='Data-Driven MPC for Quadrotors',
     version='0.1',
     description='',
 
