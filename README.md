@@ -50,7 +50,8 @@ This work depends on the ACADOS Toolkit, developed by the Optimization in Engine
 ### Minimal Requirements
 
 The branch is tested with Ubuntu 20.04, Python 3.8 and ROS Noetic.
-In the `master` branch we provide the code version for Ubuntu 18.04, Python 3.6 and ROS Melodic.
+In the `main` branch we provide the code version for Ubuntu 18.04, Python 3.6 and ROS Melodic.
+Different OS and ROS versions are possible but not supported.
 
 **Recommended**: Create a Python virtual environment for this package:
 ```
