@@ -49,7 +49,9 @@ This work depends on the ACADOS Toolkit, developed by the Optimization in Engine
 
 ### Minimal Requirements
 
-The code was tested with Ubuntu 18.04, Python 3.6 and ROS Melodic. Different OS and ROS versions are possible but not supported.
+The code was tested with Ubuntu 18.04, Python 3.6 and ROS Melodic. 
+We additionally provide python3.8 support tested with ROS Noetic in the branch `python3.8_support`.
+Different OS and ROS versions are possible but not supported.
 
 **Recommended**: Create a Python virtual environment for this package:
 ```
