@@ -374,8 +374,8 @@ def draw_drone_simulation(art_pack, x_trajectory, quad, targets, targets_reached
     def draw_fading_traj(traj, traj_artists):
         traj = np.squeeze(np.array(traj))
         for j in range(min(traj.shape[0] - 1, len(traj_artists))):
-            traj_artists[j].set_data([traj[j, 0], traj[j + 1, 0]], [traj[j, 1], traj[j + 1, 1]])
-            traj_artists[j].set_3d_properties([traj[j, 2], traj[j + 1, 2]])
+            traj_artists[j].set_data(np.array([traj[j, 0], traj[j + 1, 0]]), np.array([traj[j, 1], traj[j + 1, 1]]))
+            traj_artists[j].set_3d_properties(np.array([traj[j, 2], traj[j + 1, 2]]))
 
     # Draw missing and reached targets
     if targets is not None and targets_reached is not None:
@@ -406,7 +406,8 @@ def draw_drone_simulation(art_pack, x_trajectory, quad, targets, targets_reached
     # Draw projected trajectory
     projected_traj_artists[0].set_data(x_trajectory[trajectory_start_pt:, 0], ax.get_ylim()[1])
     projected_traj_artists[0].set_3d_properties(x_trajectory[trajectory_start_pt:, 2])
-    projected_traj_artists[1].set_data(ax.get_xlim()[0], x_trajectory[trajectory_start_pt:, 1])
+    projected_traj_artists[1].set_data(np.atleast_1d([ax.get_xlim()[0]] * (len(x_trajectory) - trajectory_start_pt)),
+                                       x_trajectory[trajectory_start_pt:, 1])
     projected_traj_artists[1].set_3d_properties(x_trajectory[trajectory_start_pt:, 2])
     [ax.draw_artist(projected_traj_artist) for projected_traj_artist in projected_traj_artists]
 
@@ -414,8 +415,8 @@ def draw_drone_simulation(art_pack, x_trajectory, quad, targets, targets_reached
     drone_art = draw_drone(x_trajectory[-1, 0:3], x_trajectory[-1, 3:7], quad.x_f, quad.y_f)
     drone_sketch_artist_x_motor.set_data(drone_art[0][0], drone_art[1][0])
     drone_sketch_artist_x_motor.set_3d_properties(drone_art[2][0])
-    drone_sketch_artist.set_data(drone_art[0], drone_art[1])
-    drone_sketch_artist.set_3d_properties(drone_art[2])
+    drone_sketch_artist.set_data(np.array(drone_art[0]), np.array(drone_art[1]))
+    drone_sketch_artist.set_3d_properties(np.array(drone_art[2]))
     ax.draw_artist(drone_sketch_artist)
     ax.draw_artist(drone_sketch_artist_x_motor)
 

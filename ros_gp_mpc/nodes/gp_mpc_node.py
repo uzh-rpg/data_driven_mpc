@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3.8
 """ ROS node for the data-augmented MPC, to use in the Gazebo simulator and real world experiments.
 
 This program is free software: you can redistribute it and/or modify it under
