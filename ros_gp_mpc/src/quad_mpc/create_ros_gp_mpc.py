@@ -36,14 +36,21 @@ def custom_quad_param_loader(quad_name):
                        float(attrib['body_inertia'][0]['izz'])])
     quad.length = float(attrib['arm_length'])
 
-    # x configuration
-    h = np.cos(np.pi / 4) * quad.length
-    quad.x_f = np.array([h, -h, -h, h])
-    quad.y_f = np.array([-h, -h, h, h])
-
     quad.max_thrust = float(attrib["max_rot_velocity"]) ** 2 * float(attrib["motor_constant"])
     quad.c = float(attrib['moment_constant'])
-    quad.z_l_tau = np.array([-quad.c, quad.c, -quad.c, quad.c])
+
+    # x configuration
+    if quad_name != "hummingbird":
+        h = np.cos(np.pi / 4) * quad.length
+        quad.x_f = np.array([h, -h, -h, h])
+        quad.y_f = np.array([-h, -h, h, h])
+        quad.z_l_tau = np.array([-quad.c, quad.c, -quad.c, quad.c])
+
+    # + configuration
+    else:
+        quad.x_f = np.array([quad.length, 0, -quad.length, 0])
+        quad.y_f = np.array([0, quad.length, 0, -quad.length])
+        quad.z_l_tau = -np.array([-quad.c, quad.c, -quad.c, quad.c])
 
     return quad
 
@@ -127,7 +134,7 @@ class ROSGPMPC:
         next_control.bodyrates.x = x_opt[1, -3]
         next_control.bodyrates.y = x_opt[1, -2]
         next_control.bodyrates.z = x_opt[1, -1]
-        next_control.rotor_thrusts = w_opt[:4]
+        next_control.rotor_thrusts = w_opt[:4] * self.quad.max_thrust
 
         # Something is off with the colibri
         if self.quad_name == "colibri":

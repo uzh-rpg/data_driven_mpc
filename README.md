@@ -297,6 +297,23 @@ Will improve the tracking performance by around 50%, resulting in an average tra
 ```
 
 #### Final notes
-The user can also run a `lemniscate` trajectory by setting: `flight_mode:=lemniscate`.
-It is also possible to edit the reference trajectories of the circle and lemniscate by modifying the file:
-`config/circle_and_lemniscate_options.yaml`
+- **Trajectory types**
+
+   The user can also run a `lemniscate` trajectory by setting: `flight_mode:=lemniscate`.
+   It is also possible to edit the reference trajectories of the circle and lemniscate by modifying the file:
+   `config/circle_and_lemniscate_options.yaml`
+  
+
+- **Thrust level control** 
+  
+   Even though the MPC model operates at thrust level control, currently the ROS node sends total thrust + body rate 
+   commands. To switch to single thrust level control, edit the following line [from the MPC ros interface file](ros_gp_mpc/src/quad_mpc/create_ros_gp_mpc.py):
+  
+   From (body rate control):
+   ```
+   next_control.control_mode = 2
+   ```
+   Instead switch to (thrust level control):
+   ```
+   next_control.control_mode = 4
+   ```
