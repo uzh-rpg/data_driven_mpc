@@ -49,13 +49,14 @@ This work depends on the ACADOS Toolkit, developed by the Optimization in Engine
 
 ### Minimal Requirements
 
-The code was tested with Ubuntu 18.04, Python 3.6 and ROS Melodic. Different OS and ROS versions are possible but not supported.
+The branch is tested with Ubuntu 20.04, Python 3.8 and ROS Noetic.
+In the `master` branch we provide the code version for Ubuntu 18.04, Python 3.6 and ROS Melodic.
 
 **Recommended**: Create a Python virtual environment for this package:
 ```
 sudo pip3 install virtualenv
 cd <PATH_TO_VENV_DIRECTORY>
-virtualenv gp_mpc_venv --python=/usr/bin/python3.6
+virtualenv gp_mpc_venv --python=/usr/bin/python3.8
 source gp_mpc_venv/bin/activate
 ```
 
@@ -295,6 +296,23 @@ Will improve the tracking performance by around 50%, resulting in an average tra
 ```
 
 #### Final notes
-The user can also run a `lemniscate` trajectory by setting: `flight_mode:=lemniscate`.
-It is also possible to edit the reference trajectories of the circle and lemniscate by modifying the file:
-`config/circle_and_lemniscate_options.yaml`
+- **Trajectory types**
+
+   The user can also run a `lemniscate` trajectory by setting: `flight_mode:=lemniscate`.
+   It is also possible to edit the reference trajectories of the circle and lemniscate by modifying the file:
+   `config/circle_and_lemniscate_options.yaml`
+  
+
+- **Thrust level control** 
+  
+   Even though the MPC model operates at thrust level control, currently the ROS node sends total thrust + body rate 
+   commands. To switch to single thrust level control, edit the following line [from the MPC ros interface file](ros_gp_mpc/src/quad_mpc/create_ros_gp_mpc.py):
+  
+   From (body rate control):
+   ```
+   next_control.control_mode = 2
+   ```
+   Instead switch to (thrust level control):
+   ```
+   next_control.control_mode = 4
+   ```
