@@ -16,7 +16,7 @@ Video: [YouTube](https://youtu.be/FHvDghUUQtc)
 @article{torrente2021data,
   title={Data-Driven MPC for Quadrotors},
   author={Torrente, Guillem and Kaufmann, Elia and Foehn, Philipp and Scaramuzza, Davide},
-  journal={arXiv},
+  journal={IEEE Robotics and Automation Letters},
   year={2021}
 }
 ```
