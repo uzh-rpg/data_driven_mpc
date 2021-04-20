@@ -328,7 +328,7 @@ Will improve the tracking performance by around 50%, resulting in an average tra
 ## Dealing with noisy data and reducing further the error
 
 During real-world experiments and even in Gazebo, one can expect to find variable amounts of noise in the collected data. 
-This is of course a problem when using a low amount of training samples (i.e. 15 or 20, as in our) for fitting a GP 
+This is of course a problem when using a low amount of training samples (i.e. 15 or 20, as in our paper) for fitting a GP 
 model. 
 
 ### *Dense-sparse* GP training
