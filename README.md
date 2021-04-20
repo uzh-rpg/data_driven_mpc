@@ -131,7 +131,8 @@ Tracking RMSE: 0.2410 m
 ```
 
 #### Further details
-You may edit the configuration variables for the `Simplified Simulator` in the file `config/configuration_parameters.py` for better visualization.
+You may edit the configuration variables for the `Simplified Simulator` in the file 
+[`config/configuration_parameters.py`](ros_gp_mpc/config/configuration_parameters.py) for better visualization.
 Within the class `SimpleSimConfig`:
 ```
 # Set to True to show a real-time Matplotlib animation of the experiments for the Simplified Simulator. Execution 
@@ -174,8 +175,11 @@ After the simulation ends, you can verify that the collected data now appears at
 
 #### Fitting a GP model
 
-First, edit the following variables of configuration file in `config/configuration_parameters.py` (class `ModelFitConfig`) so that the training script is referenced to the desired dataset. For redundancy, in order to identify the correct data file, we require to specify both the name of the dataset as well as the parameters used while acquiring the data.
-In other words, you must input the simulator options used while running the previous python script. If you did not modify these variables earlier, you don't need to change anything this time as the default setting will work:
+First, edit the following variables of configuration file in 
+[`config/configuration_parameters.py`](ros_gp_mpc/config/configuration_parameters.py) (class `ModelFitConfig`) so that the training script is referenced to the desired dataset. 
+For redundancy, in order to identify the correct data file, we require to specify both the name of the dataset, and the parameters used while acquiring the data.
+In other words, you must input the simulator options used while running the previous python script. 
+If you did not modify these variables earlier, you don't need to change anything this time as the default setting will work:
 ```
     # ## Dataset loading ## #
     ds_name = "simplified_sim_dataset"
@@ -254,7 +258,9 @@ Leave the script running until it outputs the following message:
 [INFO] [1612101145.957326, 230.510000]: No more references will be received
 ```
 
-Update the `ModelFitConfig` class from `config/configuration_parameters.py` file to point the training scripts to the new dataset:
+Update the `ModelFitConfig` class from 
+[`config/configuration_parameters.py`](ros_gp_mpc/config/configuration_parameters.py) 
+file to point the training scripts to the new dataset:
 ```
 # ## Dataset loading ## #
 ds_name = "gazebo_dataset"
@@ -317,3 +323,86 @@ Will improve the tracking performance by around 50%, resulting in an average tra
    ```
    next_control.control_mode = 4
    ```
+
+
+## Dealing with noisy data and reducing further the error
+
+During real-world experiments and even in Gazebo, one can expect to find variable amounts of noise in the collected data. 
+This is of course a problem when using a low amount of training samples (i.e. 15 or 20, as in our) for fitting a GP 
+model. 
+
+### *Dense-sparse* GP training
+We now propose a technique for circumventing this problem, which involves training a GP model in two stages.
+During the first stage, a model is trained using a larger amount of samples (for example 200), which will be more
+resistant to the data noise.
+We call this model the *dense* model.
+During a second stage, a lightweight GP is trained using the desired amount of training samples (for example 15), using
+data generated from the mean function of the trained dense GP.
+
+The following are two examples of GP's trained on noisy data from Gazebo, collected following the instructions 
+previously explained.
+The first represents a GP fitting with the standard method, while the second is the output of the *dense-sparse* pipeline:
+
+<p align="center">
+  <img src="./img/bad_gp_fitting.png" alt="normal_gp" width="1100" height="400">
+  <img src="./img/good_gp_fit.png" alt="dense-sparse_gp" width="1100" height="400">
+</p>
+
+The procedure to use this algorithm is not automated, but these are the steps to reproduce it.
+
+Train a dense GP, for example with 200 random samples. Repeat for the remaining dimensions before proceeding:
+```
+python src/model_fitting/gp_fitting.py --n_points 200 --model_name gazebo_sim_gp_dense --x 7 --y 7
+python src/model_fitting/gp_fitting.py --n_points 200 --model_name gazebo_sim_gp_dense --x 8 --y 8
+python src/model_fitting/gp_fitting.py --n_points 200 --model_name gazebo_sim_gp_dense --x 9 --y 9
+```
+Go to the parameters file `ModelFitConfig` class from 
+[`config/configuration_parameters.py`](ros_gp_mpc/config/configuration_parameters.py), and specify that from now on
+the GP models trained will use a `dense` GP model as reference for generating the training data, as specified before. 
+Modify the following variables accordingly:
+```
+use_dense_model = True
+dense_model_version = "5effda9"  # Input the correct git hash of the dense models
+dense_model_name = "gazebo_sim_gp_dense"
+dense_training_points = 200
+```
+Now train the `sparse` models. Repeat for every dimension. 
+The script will automatically pick the corresponding GP for every dimension, or warn you that it does not exist:
+```
+python src/model_fitting/gp_fitting.py --n_points 15 --model_name gazebo_sim_gp --x 7 --y 7
+python src/model_fitting/gp_fitting.py --n_points 15 --model_name gazebo_sim_gp --x 8 --y 8
+python src/model_fitting/gp_fitting.py --n_points 15 --model_name gazebo_sim_gp --x 9 --y 9
+```
+
+### Reducing further the tracking error in Gazebo
+To reduce the tracking error below `0.1m`, we encourage training the models on data collected on the lemniscate trajectory,
+and deploying them on the loop trajectory. 
+The data collected from the lemniscate in Gazebo is less noisy than the random movements, but is more aggressive than 
+the circle, so it will provide decent coverage of the test set.
+Both the circle and the lemniscate reference trajectories are generated analytically, while the random trajectories are
+piece-wise polynomials. The latter provide less feasibility guarantees when tracking the trajectory, potentially leading
+to artifacts and added noise.
+```
+roslaunch ros_gp_mpc gp_mpc_wrapper.launch recording:=True dataset_name:=gazebo_dataset_lemniscate environment:=gazebo flight_mode:=lemniscate
+```
+The user can now apply the regular GP training methodology, or the `dense-sparse` approach.
+Don't forget to update the dataset source from the configuration file, such that the models are trained on the new data:
+```
+# ## Dataset loading ## #
+ds_name = "gazebo_dataset_lemniscate"
+ds_metadata = {
+    "gazebo": "default",
+}
+```
+
+After running again the circle trajectory with this new GP trained from lemniscate data, the user should expect a test 
+error around `0.07m`, down from `0.2m`. 
+A similar error can be achieved if deploying an RDRv model also trained on lemniscate data.
+
+If instead of training a GP on the lemniscate, the user trains and deploys a model on the same circle trajectory, the 
+error should go down to `0.05m`.
+
+
+
+
+
