@@ -344,7 +344,7 @@ previously explained.
 The first represents a GP fitting with the standard method, while the second is the output of the *dense-sparse* pipeline:
 
 <p align="center">
-  <img src="./img/bad_gp_fit.png" alt="normal_gp" width="1100" height="400">
+  <img src="./img/bad_gp_fit.png" alt="normal_gp" width="1100" height="200">
   <img src="./img/good_gp_fit.png" alt="dense-sparse_gp" width="1100" height="400">
 </p>
 
