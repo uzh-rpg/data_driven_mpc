@@ -100,7 +100,6 @@ class GPMPCWrapper:
         else:
             pre_trained_models = None
         self.pre_trained_models = pre_trained_models
-        self.git_v = load_options["git"]
         if self.pre_trained_models is not None:
             rospy.loginfo("Successfully loaded GP model")
             self.model_name = load_options["model_name"]
@@ -545,10 +544,6 @@ class GPMPCWrapper:
                 executed_u_ref = self.u_ref
                 executed_t_ref = self.t_ref
 
-                self.x_ref = None
-                self.u_ref = None
-                self.t_ref = None
-
                 self.x_initial_reached = False
 
                 if self.recording_options["recording"]:
@@ -557,6 +552,10 @@ class GPMPCWrapper:
                 # Calculate MSE of position tracking and maximum axial velocity achieved
                 rmse = interpol_mse(executed_t_ref, executed_x_ref[:, :3], executed_t_ref, self.quad_trajectory[:, :3])
                 self.optimization_dt /= self.current_idx
+
+                self.x_ref = None
+                self.u_ref = None
+                self.t_ref = None
 
                 if self.ref_traj_name in self.metadata_dict.keys():
                     if self.model_name in self.metadata_dict[self.ref_traj_name].keys():
@@ -591,16 +590,16 @@ class GPMPCWrapper:
                 rospy.loginfo("Tracking complete. Total RMSE: %.5f m. Max axial vel: %.3f. "
                               "Mean optimization time: %.3f ms" % (rmse, v_max, self.optimization_dt * 1000))
 
+                # Stop landing. Quad is close to ground level
+                self.landing = False
+                self.ground_level = True
+
                 self.current_idx = 0
                 if self.plot:
                     with_gp = ' + GP ' if self.pre_trained_models is not None else ' - GP '
                     tit = r'$v_{max}$=%.2f m/s | RMSE: %.4f | %s ' % (v_max, float(rmse), with_gp)
                     trajectory_tracking_results(executed_t_ref, executed_x_ref, self.quad_trajectory, executed_u_ref,
                                                 self.quad_controls, w_control=self.w_control, title=tit)
-
-                # Stop landing. Quad is close to ground level
-                self.landing = False
-                self.ground_level = True
 
             return self.gp_mpc.set_reference(x_ref, u_ref), x_guess, u_guess
 
@@ -780,11 +779,7 @@ def main():
         recording_options["record_raw_optitrack"] = raw_optitrack
 
     # GP loading parameters
-    load_options = {
-        "git": "b6e73a5",
-        "model_name": "",
-        "params": None
-    }
+    load_options = {}
     git_id = rospy.get_param('~model_version', default=None)
     model_name = rospy.get_param('~model_name', default=None)
     model_type = rospy.get_param('~model_type', default="gp")
@@ -802,6 +797,7 @@ def main():
 
     if model_type == "rdrv":
         rdrv = load_rdrv(model_options=load_options)
+        load_options = None
     else:
         rdrv = None
 
